@@ -1,4 +1,4 @@
-package numbers_only
+package main
 
 import (
 	"fmt"
@@ -7,11 +7,20 @@ import (
 	"golang.design/x/clipboard"
 )
 
-
 var numbersRegex = regexp.MustCompile(`[\D]+`)
 
 func onlyNumbers(input string) string {
 	return numbersRegex.ReplaceAllString(input, "")
+}
+
+func stitchArgs(arguments []string) string {
+	var answer string
+
+	for _, arg := range arguments {
+		answer = answer + arg
+	}
+
+	return answer
 }
 
 func main() {
@@ -21,9 +30,15 @@ func main() {
 		panic(err)
 	}
 
-	barcode := os.Args[1]
-	answer := onlyNumbers(barcode)
-	fmt.Println(answer)
-	clipboard.Write(clipboard.FmtText, []byte(answer))
+	// get the barcode as arguments, since whitespace is consider a new argument
+	input := os.Args[1:]
+	// stitch the barcode together
+	crudeBarcode := stitchArgs(input)
+	// get only the numbers
+	barcode := onlyNumbers(crudeBarcode)
+	// print the numbers from the barcode
+	fmt.Println(barcode)
+	// and also copies it to the clipboard
+	clipboard.Write(clipboard.FmtText, []byte(barcode))
 }
 
